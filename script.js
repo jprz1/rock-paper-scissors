@@ -5,37 +5,85 @@ function computerPlay() {
 }
 
 function playRound(player, computerSelection) {
+    /*given the player's selection and computer selection returns
+    one of the three following int's representing a result
+    0: both users selected the same option therefore it's a tie
+    1: the human player won
+    2: the computer won*/
     let playerSelection = player.toLowerCase();
 
     //both select same 
     if (computerSelection === playerSelection) {
-        return `You both selected ${computerSelection}! Please try again.`
+        return 0;
     
     } else {
         switch (true) {
             case (computerSelection === "rock" && playerSelection === "scissors") :
-                return "You Lose! Rock beats Scissors";
+                return 2;
             case (computerSelection === "rock" && playerSelection === "paper"):
-                return "You Win! Paper beats Rock";
+                return 1;
             case (computerSelection === "paper" && playerSelection === "scissors"):
-                return "You Win! Scissors beats Paper";
+                return 1
             case(computerSelection === "paper" && playerSelection === "rock"):
-                return "You Lose! Paper beats Rock";
+                return 2;
             case(computerSelection === "scissors" && playerSelection === "rock"):
-                return "You Win! Rock beats Scissors";
+                return 1;
             case(computerSelection === "scissors" && playerSelection === "paper"):
-                return "You Lose! Scissors beats Paper";
+                return 2;
 
         } 
     }
 }
 
-function game() {
-    let selection = window.prompt("Press 'n' to exit. Otherwise input 'Paper', 'Scissors', or 'Rock' to play!")
+function processResult(result, computerSelection, playerSelection) {
+    const resultElement = document.querySelector(".result");
 
-    while (selection !== 'n') {
-        console.log(playRound(selection, computerPlay()));
-        selection = window.prompt("Press 'n' to exit. Otherwise input 'Paper', 'Scissors', or 'Rock' to play!")
+    
+    //get player element and current score
+    const comp = document.querySelector("#computer");
+    const player = document.querySelector("#player");
+    let compScore = parseInt(comp.innerHTML);
+    let playerScore = parseInt(player.innerHTML);
+
+    switch (result) {
+        case 0:
+            resultElement.textContent = `You both selected ${computerSelection}. Try again.`;
+            break;
+        case 1:
+            resultElement.textContent = `${playerSelection} beats ${computerSelection}`;
+            playerScore++;
+            break;
+        case 2:
+            resultElement.textContent = `${computerSelection} beats ${playerSelection}`;
+            compScore++;
+            break;
     }
-    console.log("Thank you for playing!")
+
+    comp.textContent = `${compScore}`;
+    player.textContent = `${playerScore}`;
+
+    if (playerScore === 5 || compScore === 5) {
+        if (playerScore > compScore) {
+            resultElement.textContent = "You have won!"
+        } else {
+            resultElement.textContent = "You have lost!"
+        }
+        comp.textContent = "0";
+        player.textContent = "0";
+        resultElement.textContent = "Click a button to play again!";
+
+    }
 }
+
+//figure out player selection and process a game
+const buttons = document.querySelectorAll("button");
+buttons.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+        let playerSel = e.target.innerHTML;
+        let computerSel = computerPlay();
+        let result = playRound(playerSel, computerSel);
+        processResult(result, computerSel, playerSel);
+
+    })
+    
+})
